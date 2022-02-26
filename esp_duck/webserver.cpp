@@ -112,7 +112,8 @@ namespace webserver {
 
         WEBSERVER_CALLBACK;
 
-        // Arduino OTA Update
+        // Arduino OTA 
+      
         ArduinoOTA.onStart([]() {
             events.send("Update Start", "ota");
         });
@@ -140,35 +141,8 @@ namespace webserver {
         server.addHandler(&events);
 
         // Web OTA
-        server.on("/update", HTTP_POST, [](AsyncWebServerRequest* request) {
-            reboot = !Update.hasError();
 
-            AsyncWebServerResponse* response;
-            response = request->beginResponse(200, "text/plain", reboot ? "OK" : "FAIL");
-            response->addHeader("Connection", "close");
-
-            request->send(response);
-        }, [](AsyncWebServerRequest* request, String filename, size_t index, uint8_t* data, size_t len, bool final) {
-            if (!index) {
-                debugf("Update Start: %s\n", filename.c_str());
-                Update.runAsync(true);
-                if (!Update.begin((ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000)) {
-                    Update.printError(Serial);
-                }
-            }
-            if (!Update.hasError()) {
-                if (Update.write(data, len) != len) {
-                    Update.printError(Serial);
-                }
-            }
-            if (final) {
-                if (Update.end(true)) {
-                    debugf("Update Success: %uB\n", index+len);
-                } else {
-                    Update.printError(Serial);
-                }
-            }
-        });
+         
 
         dnsServer.setTTL(300);
         dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
@@ -186,9 +160,7 @@ namespace webserver {
     }
 
     void update() {
-        ArduinoOTA.handle();
-        if (reboot) ESP.restart();
-        dnsServer.processNextRequest();
+
     }
 
     void send(const char* str) {
