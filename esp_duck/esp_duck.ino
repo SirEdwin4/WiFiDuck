@@ -46,7 +46,27 @@ void setup() {
 }
 
 void loop() {
-    com::update();
+     while (Serial.available() > 0) {
+    //57 AB 83 0C 12 01 00 00 04 00 00 00 00 00 12 17
+    if (Serial.read() == 0x83){
+      delay(10);
+      if (Serial.read() == 0x0C){
+        delay(10);
+        if (Serial.read() == 0x12){
+          delay(10);
+          if (Serial.read() == 0x01){
+            delay(10);
+            Serial.read();
+            delay(10);
+            Serial.read();
+            delay(10);
+            logFile.print(getKey(Serial.read()));
+          }
+        }
+      }
+    }
+  } 
+   com::update();
     webserver::update();
 
     debug_update();
