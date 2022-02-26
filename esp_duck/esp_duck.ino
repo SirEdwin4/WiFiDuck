@@ -13,6 +13,8 @@
 #include "settings.h"
 #include "cli.h"
 
+File logFile;
+
 void setup() {
     debug_init();
 
